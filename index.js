@@ -1,36 +1,46 @@
 const precioUnitario = 150000;
+let carrito = []; 
 
-let productos = ["Notebook", "Celular", "Televisión"]
-let = nombreCliente = prompt("Ingrese su nombre")
-function saludar(nombre) {
-    alert("Hola " +  nombre + " Bienvenido al simulador!.");
-}
-
-saludar (nombreCliente)
-
-function elegirProducto () {
-    let mensaje = "Productos disponibles:";
-    for (let i = 0; i<productos.length; ++i) {
-        mensaje += (i + 1) + "." + productos [i] + "";
-    } 
-
-    let opcion = prompt(mensaje + " Ingrese el numero del producto:");
-    return productos [opcion -1];
-}
-
-let productoElegido = elegirProducto();
-
-function calcularPrecio (cantidad, precio) {
-    return cantidad * precio;
-}
-
-let cantidad = parseInt(prompt("¿Cuantas unidades de " + productoElegido + " desea comprar?"))
-let total   = calcularPrecio (cantidad, precioUnitario);
-
-alert ("Resumen de compra: " +
-      "Cliente: " + nombreCliente + "" +
-      "Producto: " + productoElegido + "" +
-      "Cantidad: " + cantidad + "" +
-      "Precio total: $" + total);
+document.addEventListener("DOMContentLoaded", () => {
+  const form = document.getElementById("formCompra");
+  const resultado = document.getElementById("resultado");
 
 
+  if (localStorage.getItem("carrito")) {
+    carrito = JSON.parse(localStorage.getItem("carrito"));
+    mostrarUltimaCompra(carrito[carrito.length - 1]);
+  }
+
+  form.addEventListener("submit", function (e) {
+    e.preventDefault();
+
+    const nombre = document.getElementById("nombre").value;
+    const producto = document.getElementById("producto").value;
+    const cantidad = parseInt(document.getElementById("cantidad").value);
+
+    if (isNaN(cantidad) || cantidad <= 0) {
+      resultado.innerHTML = "<p class='text-danger'>Por favor, ingresá una cantidad válida.</p>";
+      return;
+    }
+
+    const total = cantidad * precioUnitario;
+
+    const compra = { nombre, producto, cantidad, total };
+
+    carrito.push(compra);
+
+    localStorage.setItem("carrito", JSON.stringify(carrito));
+
+    mostrarUltimaCompra(compra);
+  });
+
+  function mostrarUltimaCompra(compra) {
+    resultado.innerHTML = `
+      <h3>Resumen de compra</h3>
+      <p><strong>Cliente:</strong> ${compra.nombre}</p>
+      <p><strong>Producto:</strong> ${compra.producto}</p>
+      <p><strong>Cantidad:</strong> ${compra.cantidad}</p>
+      <p><strong>Total:</strong> $${compra.total}</p>
+    `;
+  }
+});
